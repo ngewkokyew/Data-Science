@@ -1,0 +1,139 @@
+\documentclass{article}
+\title{Distance based models}
+\author{Ngew Kok Yew}
+\date{today}
+\usepackage[utf8]{inputenc} 
+\usepackage{amsmath}
+\usepackage{amsthm}
+\allowdisplaybreaks
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\begin{document}
+\maketitle
+\pagenumbering{gobble}
+\newpage
+\pagenumbering{arabic}
+\section{Introduction}
+\begin{definition}
+Let $\Vec{X} = \Re^d$, the $\textbf{Minkowksi distance}$ of order $p>0$ defined as 
+\begin{align*}
+    \operatorname{Dis}_{p} (\Vec{x}, \Vec{y}) &=
+    (\displaystyle\sum_{i=1}^{n} (x_i - y_i)^p)^\frac{1}{p} \\
+    &= |\Vec{x}-\Vec{y}|_p
+\end{align*}
+where $|\Vec{z}|_p$ is called $p$-norm of vector $\Vec{z}$.
+\end{definition}
+
+\begin{definition}
+Given an instance space $\Vec{X}$, a distance metric is a function $\text{Dis: }\Vec{X} \times \Vec{X} \rightarrow \Re$ for any $x, y, z \in \Vec{X}$:
+\begin{itemize}
+    \item $\text{Dis }(x, x)=0$
+    \item $\text{Dis }(x, y)>0$ for $x \neq y$
+    \item $\text{Dis } (x, y) = \text{Dis } (y, x)$
+    \item $\text{Dis } (x, y) + \text{Dis } (y, z) \geq \text{Dis } (x, z)$
+\end{itemize}
+\end{definition}
+
+\begin{definition}
+$\textbf{Mahalanobis distance}$ is defined as 
+\begin{equation*}
+    \operatorname{Dis}_{m} (\Vec{x}, \Vec{y}) = [(\Vec{x}-\Vec{y})^T\Sigma^{-1}(\Vec{x}-\Vec{y})]^\frac{1}{2}
+\end{equation*}
+where $\Sigma$ is the covariance matrix.
+\end{definition}
+
+\section{Neighbours and exemplars}
+\paragraph{}
+Exemplar is like the main reference. The most basic classifier based on neighbours is treating mean vector from each class as exemplar.
+
+\begin{theorem}
+The arithmetic mean $\Vec{\mu}$ of a set of data points $D$ in a Euclidean distance is the unique point that minimizes the sum of squared Euclidean distances to those data points.
+\end{theorem}
+\begin{proof}
+Let  $\Vec{y}$ be the unique vector of the solution of 
+\begin{gather*}
+    \hat{\Vec{\mu}} = \operatorname*{arg \hspace{1mm} min}_\Vec{y} \displaystyle\sum_{\Vec{x} \in D} |\Vec{x}-\Vec{y}|^2 \\
+    \frac{\partial}{\partial\Vec{y}} \displaystyle\sum_{\Vec{x} \in D} |\Vec{x}-\Vec{y}|^2 = 2(-1)\displaystyle\sum_{\Vec{x} \in D} |\Vec{x}-\Vec{y}|
+\end{gather*}
+Solving the partial derivative equals to zero, we've
+\begin{align*}
+    &-2\displaystyle\sum_{\Vec{x} \in D} |\Vec{x}-\Vec{y}| = 0 \\
+    &-2\displaystyle\sum_{\Vec{x} \in D} \Vec{x} + 2|D|\Vec{y} = 0 \\
+    &\Vec{y} = \frac{1}{|D|}\displaystyle\sum_{\Vec{x} \in D} \Vec{x} = \Vec{\mu}
+\end{align*}
+\end{proof}
+
+\paragraph{} 
+The classifier is formed by the perpendicular bisector of the line segment connecting a pair of exemplars. Then classify the instances by the side it lies with refer to the boundary. Or in simple, just classify according to the shortest distance formed with any exemplars.
+
+\section{Nearest-neighbour classification}
+\paragraph{}
+The idea of $k$-nearest neighbour method is takes a vote between the $k \geq 1$ nearest exemplars of instances to be classified and predicts by the majority class.
+
+\section{Distance-based clustering}
+\paragraph{}
+There are two ways to do this, but the algorithm is exactly the same using different exemplars, one is mean and the other is medoid. An medoid is an instance from correspond cluster such that the total distance comparing with all other instances in the same cluster is minimum. The following is the approach:
+\paragraph{}
+Step 1: Define number of $k$.
+\paragraph{}
+Step 2: Randomly initiate $k$ vectors as $\Vec{\mu}_1, \cdots, \Vec{\mu}_k$.
+\paragraph{}
+Step 3: Assign each instance $\Vec{x}_i$ to $\operatorname*{arg \hspace{1mm} min} Dis(\Vec{x}_i, \Vec{\mu}_j)$, $i.e.$ assign $\Vec{x}_i$ to cluster $j$ such that distance between $\Vec{x}_i$ and 
+$\Vec{\mu}_j$ is minimum compared to other $\Vec{\mu}_i$.
+\paragraph{}
+Step 4: After assignation, compute new $\Vec{\mu}_1, \cdots, \Vec{\mu}_k$ based on either by mean or medoid.
+\paragraph{}
+Step 5: Repeat step 3 and 4 until no further change in means or medoids.
+
+\subsection{Number of Clusters}
+\paragraph{}
+How are we suppose to know the actual number of clusters hidden behind the data? One of the way to help us sort out the optimal clusters number for unsupervised learning is Silhouettes Method. Let
+\begin{align*}
+    &\Vec{x}_i \text{ be any data point.} \\
+    &D_{j(i)} \text{ be the cluster that } \Vec{x}_i \text{ lies in.} \\
+    &a(\Vec{x}_i) \text{ be the average distance of } \Vec{x}_i  \text{ to all points in its own cluster } D_{j(i)}. \\
+    &b(\Vec{x}_i) \text{ be the average distance of } \Vec{x}_i  \text{ to all points in its most neighbouring cluster } D_{j}.
+\end{align*}
+Then
+\begin{equation*}
+    \text{Silhouette of } \Vec{x}_i, s(\Vec{x}_i) = 
+    \frac{b(\Vec{x}_i)-a(\Vec{x}_i)}{\max(a(\Vec{x}_i),b(\Vec{x}_i))} 
+\end{equation*}
+\paragraph{}
+If $\Vec{x}_i$ is in the "right" cluster, then $b(\Vec{x}_i)$ should more than $a(\Vec{x}_i)$ in great magnitude, hence $s(\Vec{x}_i)$ should approximate to 1. If $\Vec{x}_i$ is in the "not-so-right" cluster, then $b(\Vec{x}_i)\approx a(\Vec{x}_i)$ making $s(\Vec{x}_i) \approx 0$. If $\Vec{x}_i$ gives $b(\Vec{x}_i) < a(\Vec{x}_i)$, then $s(\Vec{x}_i)$ is going to be negative.
+
+\paragraph{}
+Plot $s(\Vec{x}_i)$ for all $i$ and clusters pattern with high $s(\Vec{x}_i)$ is more convincing. $\qed$
+
+\section{Hierarchical Clustering}
+\begin{definition}
+Given a dataset $D$, a \textbf{dendrogram} is a binary tree with the elements of $D$ at its leaves. An internal node of the tree represents the subset of elements in the leaves of the subtree noted at that node. The level of a node is the distance between the two cluster represented by the children of the node. Leaves have level 0.
+\end{definition}
+\begin{definition}
+A \textbf{linkage function} $L: 2^X \times 2^X \rightarrow \Re$ calculates the distance between arbitary subsets of the instance space, given a distance metric $Dis: X \times X \rightarrow \Re$.
+\end{definition}
+
+\paragraph{}
+Some common linkages:
+\begin{align*}
+    &\operatorname{L}_{\text{single}} (A, B) = \operatorname*{min}_{x \in A, y \in B} Dis (x, y) \\
+    &\operatorname{L}_{\text{double}} (A, B) = \operatorname*{max}_{x \in A, y \in B} Dis (x, y) \\
+    &\operatorname{L}_{\text{average}} (A, B) = \frac{\displaystyle\sum_{x\in A, y\in B}Dis (x, y)}{|A|\cdot|B|}\\
+    &\operatorname{L}_{\text{centroid}} (A, B) = 
+    Dis(\frac{\displaystyle\sum_{x\in A}x}{|A|},\frac{\displaystyle\sum_{y\in B}y}{|B|})
+\end{align*}
+
+The following is the clustering algorithm of Hierachical:
+\paragraph{}
+Step 1: Initiate clusters to singleton data points.
+\paragraph{}
+Step 2: Create a leaf at level 0 for all clusters.
+\paragraph{}
+Step 3: Find the pair $X, Y$ with lowest linkage defined and merge.
+\paragraph{}
+Step 4: Create a parent of $X, Y$ at level $l$.
+\paragraph{}
+Step 5: Repeat step 3 and 4 until all merge into one cluster.
+\end{document}

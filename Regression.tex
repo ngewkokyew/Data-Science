@@ -1,0 +1,464 @@
+\documentclass{article}
+\title{Linear Regression}
+\author{Ngew Kok Yew}
+\date{today}
+\usepackage[utf8]{inputenc} 
+\usepackage{amsmath}
+\usepackage{amsthm}
+\allowdisplaybreaks
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newtheorem{definition}{Definition}
+\begin{document}
+\maketitle
+\pagenumbering{gobble}
+\newpage
+\pagenumbering{arabic}
+
+\section{Introduction}
+\paragraph{}
+Our intention is to learn a function estimator $\hat{f}:\mathcal{X}\to R$ from examples $(x_i,f(x_i))$. The following will emphasizes a zero-centered approach.
+
+\subsection{The Least Square Method}
+\begin{definition}
+Residual, $\varepsilon_i$ is the difference between the actual and estimated function values, $i.e.$
+\begin{equation}
+\varepsilon_i = f(x_i) - \hat{f}(x_i)
+\end{equation}
+\end{definition}
+\paragraph{}
+If the function $\hat{f}$ is an good estimator, then the errors made should be small, hence we want an estimator that can minimized $\displaystyle\sum_{i=1}^{n} \varepsilon_i^2$.
+\paragraph{}
+Suppose we've a univariate linear relationship $(x_i, y_i)$ tell us that 
+\begin{equation*}
+y = \beta_0 + \beta_1 x
+\end{equation*}
+where $a$ and $b$ are estimated such that $\displaystyle\sum_{i=1}^{n} \varepsilon_i^2$ is minimized. Or in other words,
+\begin{equation}
+\displaystyle\sum_{i=1}^{n} [y_i - (\beta_0 + \beta_1 x_i)]^2
+\end{equation}
+is minimized.
+
+\paragraph{}
+Thus, differentiate equation (2) w.r.t $\beta_0$, we've
+\begin{gather*}
+2\displaystyle\sum_{i=1}^{n} [y_i-(\beta_0 + \beta_1 x_i)](-1) = 0 \\
+\displaystyle\sum_{i=1}^{n} [y_i-(\beta_0 + \beta_1 x_i)] = 0
+\end{gather*}
+\begin{align*}
+\displaystyle\sum_{i=1}^{n} y_i &= \displaystyle\sum_{i=1}^{n}(\beta_0 + \beta_1 x_i) \\
+&= n\beta_0 + \displaystyle\sum_{i=1}^{n} \beta_1 x_i \\
+n\beta_0 &= \displaystyle\sum_{i=1}^{n} y_i - \displaystyle\sum_{i=1}^{n} \beta_1 x_i 
+\end{align*}
+\begin{equation}
+\hat{\beta_0} = \Bar{y}-\hat{\beta_1}\Bar{x} \qed
+\end{equation}
+
+Following, differentiate equation (2) w.r.t $\beta_1$, we've
+\begin{gather*}
+2\displaystyle\sum_{i=1}^{n} [y_i-(\beta_0 + \beta_1 x_i)](-x_i) = 0 \\
+\displaystyle\sum_{i=1}^{n} [y_i-(\beta_0 + \beta_1 x_i)](x_i) = 0 
+\end{gather*}
+\begin{equation}
+\begin{split}
+\displaystyle\sum_{i=1}^{n} x_i y_i &= \displaystyle\sum_{i=1}^{n} (\beta_0 + \beta_1 x_i)(x_i) \\
+&= \beta_0 \displaystyle\sum_{i=1}^{n} x_i + \beta_1 \displaystyle\sum_{i=1}^{n} x_i^2
+\end{split}
+\end{equation}
+
+Substitute equation (3) into (4),
+\begin{align*}
+\displaystyle\sum_{i=1}^{n} x_i y_i &= (\Bar{y}-\hat{\beta_1}\Bar{x})\displaystyle\sum_{i=1}^{n} x_i + \hat{\beta_1} \displaystyle\sum_{i=1}^{n} x_i^2  \\
+&= \Bar{y}\displaystyle\sum_{i=1}^{n} x_i - \hat{\beta_1}\Bar{x}\displaystyle\sum_{i=1}^{n} x_i + \hat{\beta_1}\displaystyle\sum_{i=1}^{n} x_i^2 
+\end{align*}
+\begin{align}
+\hat{\beta_1} &= \frac{\displaystyle\sum_{i=1}^{n} x_i y_i - \Bar{y}\displaystyle\sum_{i=1}^{n}x_i}{-\Bar{x}\displaystyle\sum_{i=1}^{n}x_i +\displaystyle\sum_{i=1}^{n}x_i^2} \nonumber \\
+&= \frac{\displaystyle\sum_{i=1}^{n} (x_i y_i - \Bar{y}x_i)}{\displaystyle\sum_{i=1}^{n} {x_i^2 - \Bar{x}\displaystyle\sum_{i=1}^{n}x_i}}
+\end{align}
+
+Note that 
+\begin{equation}
+\begin{split}
+\displaystyle\sum_{i=1}^{n} (\Bar{x}\Bar{y}-\Bar{x}y_i) &=
+\Bar{x}\displaystyle\sum_{i=1}^{n}(\Bar{y}-y_i) \\
+&= \Bar{x}(n\Bar{y}-\displaystyle\sum_{i=1}^{n}y_i) \\
+&= \Bar{x}(n\Bar{y}-n\Bar{y}) = 0
+\end{split}
+\end{equation}
+
+Same goes to 
+\begin{equation}
+\displaystyle\sum_{i=1}^{n} (\Bar{x}^2 - \Bar{x}x_i) = 0
+\end{equation}
+
+Substitute both equation (6) and (7) into (5), we've
+\begin{align*}
+\hat{\beta_1} &= \frac{\displaystyle\sum_{i=1}^{n} (x_i y_i - \Bar{y}x_i)}{\displaystyle\sum_{i=1}^{n} {x_i^2 - \Bar{x}\displaystyle\sum_{i=1}^{n}x_i}} \\
+&= \frac{\displaystyle\sum_{i=1}^{n} (x_i y_i - \Bar{y}x_i)+\displaystyle\sum_{i=1}^{n} (\Bar{x}\Bar{y}-\Bar{x}y_i)}{\displaystyle\sum_{i=1}^{n} {x_i^2 - \Bar{x}\displaystyle\sum_{i=1}^{n}x_i}+\displaystyle\sum_{i=1}^{n} (\Bar{x}^2 - \Bar{x}x_i)} \\
+&= \frac{\displaystyle\sum_{i=1}^{n}(x_i - \Bar{x})(y_i - \Bar{y})}{\displaystyle\sum_{i=1}^{n}(x_i - \Bar{x})^2} \\
+&= \frac{\sigma_{x,y}}{\sigma_{x,x}} \qed
+\end{align*} where $\sigma_{xy}$ is the correlation of $x$ and $y$ and $\sigma_{xx}$ is the variance of $x$.
+
+\subsection{Multivariate Linear Regression}
+\paragraph{}
+Section 1.1 has demonstrated how to perform least square method for an uni-variate case. As we can see, $\hat{\beta_0}$ is just a linear combination of $\hat{\beta_1}, \Bar{x}, \text{and } \Bar{y}$ whereas $\hat{\beta_1}$ is a ratio of two co-variances. Now, we will be using the similar approach to generate the general form of coefficients for multivariate case, but this round the variables are zero-centered (mean is zero).
+\paragraph{}
+Consider an uni-variate case with $n$ many observations, where the estimated function is derived in the following form
+\begin{align*}
+    y &= \hat{\beta_0} + \hat{\beta_1}x \\
+    y &= \Bar{y} - \hat{\beta_1}\Bar{x} + \hat{\beta_1}x \\
+    y - \Bar{y} &= \hat{\beta_1}(x - \Bar{x})
+\end{align*}
+
+If we extend the form into matrix by including all observations, we've
+\begin{equation}
+    \begin{pmatrix}
+    y_1 - \Bar{y} \\
+    y_2 - \Bar{y} \\
+    \vdots \\
+    y_n - \Bar{y}
+    \end{pmatrix}
+    =
+    \hat{\beta_1}  
+    \begin{pmatrix}
+    x_1 - \Bar{x} \\
+    x_2 - \Bar{x} \\
+    \vdots \\
+    x_n - \Bar{x}
+    \end{pmatrix}
+\end{equation} Extend equation (8) by considering $d$ many variables, then we've
+\begin{gather*}
+    \begin{pmatrix}
+    y_1 - \Bar{y} \\
+    y_2 - \Bar{y} \\
+    \vdots \\
+    y_n - \Bar{y}
+    \end{pmatrix}
+    = 
+    \begin{pmatrix}
+    x_{11} - \Bar{x}_1 & x_{12} - \Bar{x}_2 & \cdots & x_{1d} - \Bar{x}_d \\
+    x_{21} - \Bar{x}_1 & x_{22} - \Bar{x}_2 & \cdots & x_{2d} - \Bar{x}_d \\
+    \vdots \\
+    x_{n1} - \Bar{x}_1 & x_{n2} - \Bar{x}_2 & \cdots & x_{nd} - \Bar{x}_d 
+    \end{pmatrix}
+    \begin{pmatrix}
+    \hat{\beta_1} \\
+    \hat{\beta_2} \\
+    \vdots  \\
+    \hat{\beta_d}
+    \end{pmatrix} \\
+    \Vec{y} = \Vec{X}\Vec{\hat{\beta}}
+\end{gather*} where $\beta_1$, $\cdots$,$\beta_1$ are the regression coefficient for variables $x_1$, $\cdots$, $x_d$. The solution form of $\Vec{\hat{\beta}}$ is similar to the solution derived in previous section, $i.e.$
+\begin{equation}
+    \Vec{\hat{\beta}} = 
+     \begin{pmatrix}
+    \hat{\beta_1} \\
+    \hat{\beta_2} \\
+    \vdots  \\
+    \hat{\beta_d}
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+    \frac{\sigma_{1y}}{\sigma_1} \\
+    \frac{\sigma_{2y}}{\sigma_2} \\
+    \vdots \\
+    \frac{\sigma_{dy}}{\sigma_d} \\
+    \end{pmatrix}
+\end{equation}
+
+\paragraph{}
+To obtain a simplified version of equation (9), lets consider matrix $\Vec{X}^T \Vec{y}$, a $d \times 1$ matrix,
+\begin{equation*}
+    \Vec{X}^T \Vec{y} = 
+    \begin{pmatrix}
+    x_{11} - \Bar{x}_1 & x_{21} - \Bar{x}_1 & \cdots & x_{n1} - \Bar{x}_1 \\
+    x_{12} - \Bar{x}_2 & x_{22} - \Bar{x}_2 & \cdots & x_{n2} - \Bar{x}_2 \\
+    \vdots \\
+    x_{1d} - \Bar{x}_d & x_{2d} - \Bar{x}_d & \cdots & x_{nd} - \Bar{x}_d 
+    \end{pmatrix}
+    \begin{pmatrix}
+    y_1 - \Bar{y} \\
+    y_2 - \Bar{y} \\
+    \vdots \\
+    y_n - \Bar{y}
+    \end{pmatrix},
+\end{equation*}
+the $j$th entry of $\Vec{X}^T \Vec{y}$ is 
+\begin{align*}
+    (\Vec{X}^T\Vec{y})_j &= (x_{1j}-\Bar{x}_{j})(y_1 - \Bar{y}) +
+    (x_{2j}-\Bar{x}_{j})(y_2 - \Bar{y}) + 
+    \cdots +
+    (x_{nj}-\Bar{x}_{j})(y_n - \Bar{y}) \\
+    &= \displaystyle\sum_{i=1}^{n} (x_{ij}-\Bar{x}_{j})(y_i - \Bar{y}) \\
+    &= n \sigma_{jy}
+\end{align*} 
+Thus 
+\begin{equation}
+    \Vec{X}^T \Vec{y} =
+    \begin{pmatrix}
+    n \sigma_{1y} \\
+    \vdots \\
+    n \sigma_{dy}
+    \end{pmatrix}
+    =
+    n \begin{pmatrix}
+    \sigma_{1y} \\
+    \vdots \\
+    \sigma_{dy}
+    \end{pmatrix}
+\end{equation}
+
+Now, consider a scatter matrix, $S = \Vec{X}^T \Vec{X}$,
+\begin{align}
+    \Vec{S} &= 
+    \begin{pmatrix}
+    x_{11} - \Bar{x}_1 & \cdots & x_{n1} - \Bar{x}_1 \\
+    \vdots \\
+    x_{1d} - \Bar{x}_d & \cdots & x_{nd} - \Bar{x}_d \\
+    \end{pmatrix}
+    \begin{pmatrix}
+    x_{11} - \Bar{x}_1 & \cdots & x_{1d} - \Bar{x}_d \\
+    \vdots \\
+    x_{n1} - \Bar{x}_1 & \cdots & x_{nd} - \Bar{x}_d \\
+    \end{pmatrix} \nonumber \\
+    &=
+    \begin{pmatrix}
+    (x_{11}-\Bar{x}_1)^2 + \dotsc + (x_{n1}-\Bar{x}_1)^2
+    & \cdots &
+    (x_{11}-\Bar{x}_1)(x_{1d}-\Bar{x}_d) + \dotsc +
+    (x_{n1}-\Bar{x}_1)(x_{nd}-\Bar{x}_d) \\
+    \vdots \\
+    (x_{1d}-\Bar{x}_d)(x_{11}-\Bar{x}_1) + \dotsc +
+    (x_{nd}-\Bar{x}_d)(x_{n1}-\Bar{x}_1)
+    & \cdots &
+    (x_{1d}-\Bar{x}_d)^2 + \dotsc + (x_{nd}-\Bar{x}_d)^2
+    \end{pmatrix} \nonumber \\
+    &=
+    \begin{pmatrix}
+    \displaystyle\sum_{i=1}^{n} (x_{i1}-\Bar{x}_1)^2
+    & \cdots &
+    \displaystyle\sum_{i=1}^{n} (x_{i1}-\Bar{x}_1)(x_{id}-\Bar{x}_d)\\
+    \vdots \\
+    \displaystyle\sum_{i=1}^{n} (x_{id}-\Bar{x}_d)(x_{i1}-\Bar{x}_1)
+    & \cdots &
+    \displaystyle\sum_{i=1}^{n} (x_{id}-\Bar{x}_d)^2 
+    \end{pmatrix} \nonumber \\
+    &=
+    \begin{pmatrix}
+    n\sigma_{1} & \cdots & n\sigma_{1d} \\
+    \vdots \\
+    n\sigma_{1d} & \cdots & n\sigma_{d}
+    \end{pmatrix} 
+    = n     \begin{pmatrix}
+    \sigma_{1} & \cdots & \sigma_{1d} \\
+    \vdots \\
+    \sigma_{1d} & \cdots & \sigma_{d}
+    \end{pmatrix} 
+\end{align}
+
+Substitute equation (10) and (11) into (9), we've
+\begin{align}
+    \hat{\Vec{\beta}} &= 
+    \begin{pmatrix}
+    \frac{\sigma_{1y}}{\sigma_{1}} \\
+    \vdots \\
+    \frac{\sigma_{dy}}{\sigma_{d}} 
+    \end{pmatrix} \nonumber \\
+    &=
+    \Vec{S}^{-1}(\Vec{X}^T\Vec{y}) \nonumber \\
+    &=
+    (\Vec{X}^T\Vec{X})^{-1}(\Vec{X}^T\Vec{y}) \qed
+\end{align} where $\Vec{X}$ and $\Vec{y}$ are zero-centered of the original instance and output spaces.
+
+\subsection{Binary Classification using Linear Regression}
+\paragraph{}
+Consider a binary case, we can encode the categorical output as $y_i \in\{-1, 1\}$, $i.e.$ either positive or negative. 
+Consider the $j$th-row of $\Vec{X}^T\Vec{y}$,
+\begin{align*}
+    (\Vec{X}^T\Vec{y})_j &= n \sigma_{jy} \\
+    &= \displaystyle\sum_{i=1}^{n} (x_{ij}-\Bar{x}_{j})(y_i - \Bar{y}) 
+\end{align*} 
+Let $Pos$ and $Neg$ be the number of instances with correspond class label and $\oplus$ and $\ominus$ be the subset of instances with correspond class label. Then above equation can be written as
+\begin{align*}
+    (\Vec{X}^T\Vec{y})_j &=
+    \displaystyle\sum_{i\in\oplus}^{Pos} (x_{ij}-\Bar{x}_{j})(y_i - \Bar{y})
+    +
+    \displaystyle\sum_{i\in\ominus}^{Neg} (x_{ij}-\Bar{x}_{j})(y_i - \Bar{y}) \\
+    &=
+    \displaystyle\sum_{i\in\oplus}^{Pos} (x_{ij}-\Bar{x}_{j})(1 - \Bar{y})
+    +
+    \displaystyle\sum_{i\in\ominus}^{Neg} (x_{ij}-\Bar{x}_{j})(-1 - \Bar{y}) \\
+    &=
+    (1-\Bar{y})\displaystyle\sum_{i\in\oplus}^{Pos} (x_{ij}-\Bar{x}_{j})
+    -
+    (1+\Bar{y})\displaystyle\sum_{i\in\ominus}^{Neg} (x_{ij}-\Bar{x}_{j}) \\
+    &=
+    (\frac{n-Pos+Neg}{n})\displaystyle\sum_{i\in\oplus}^{Pos}(x_{ij}-\Bar{x}_{j})
+    -
+    (\frac{n+Pos-Neg}{n})\displaystyle\sum_{i\in\ominus}^{Neg}(x_{ij}-\Bar{x}_{j})
+    \\
+    &=
+    (\frac{Pos+Neg-Pos+Neg}{n})\displaystyle\sum_{i\in\oplus}^{Pos}(x_{ij}-\Bar{x}_{j})
+    -
+    (\frac{Pos+Neg+Pos-Neg}{n})\displaystyle\sum_{i\in\ominus}^{Neg}(x_{ij}-\Bar{x}_{j}) \\
+    &=
+    (\frac{2Pos\times Neg}{n})(\frac{1}{Pos}) \displaystyle\sum_{i\in\oplus}^{Pos}(x_{ij}-\Bar{x}_{j}) -
+    (\frac{2Pos\times Neg}{n})(\frac{1}{Neg}) \displaystyle\sum_{i\in\ominus}^{Neg}(x_{ij}-\Bar{x}_{j}) \\
+    &=
+    (\frac{2Pos\times Neg}{n})(\mu_j^{\oplus}-\mu_j^{\ominus})
+\end{align*}
+where
+\begin{equation*}
+    \mu_j^{\oplus} = (\frac{1}{Pos}) \displaystyle\sum_{i\in\oplus}^{Pos}(x_{ij-\Bar{x}_{j}}),  \hspace{10mm} 
+    \mu_j^{\ominus} = (\frac{1}{Neg}) \displaystyle\sum_{i\in\ominus}^{Neg}(x_{ij-\Bar{x}_{j}})
+\end{equation*}
+Thus
+\begin{equation*}
+    \Vec{X}^T\Vec{y} = (\frac{2Pos\times Neg}{n}) 
+    \begin{pmatrix}
+    \mu_1^{\oplus}-\mu_1^{\ominus} \\
+    \vdots \\
+    \mu_d^{\oplus}-\mu_d^{\ominus}
+    \end{pmatrix}
+\end{equation*}
+Or
+\begin{align}
+    \hat{\Vec{\beta}} &=
+    (\Vec{X}^T\Vec{X})^{-1}(\Vec{X}^T\Vec{y}) \nonumber \\
+    &=
+    [n     \begin{pmatrix}
+    \sigma_{1} & \cdots & \sigma_{1d} \\
+    \vdots \\
+    \sigma_{1d} & \cdots & \sigma_{d}
+    \end{pmatrix}]^{-1}
+    (\frac{2Pos\times Neg}{n}) 
+    \begin{pmatrix}
+    \mu_1^{\oplus}-\mu_1^{\ominus} \\
+    \vdots \\
+    \mu_d^{\oplus}-\mu_d^{\ominus}
+    \end{pmatrix} \nonumber \\
+    &=
+    (\frac{2Pos\times Neg}{n^2}) 
+    \begin{pmatrix}
+    \frac{\mu_1^{\oplus}-\mu_1^{\ominus}}{\sigma_1} \\
+    \vdots \\
+    \frac{\mu_d^{\oplus}-\mu_d^{\ominus}}{\sigma_d}
+    \end{pmatrix} \qed 
+\end{align}
+
+\paragraph{}
+Equation (13) is the estimated solution for the coefficient vector $\hat{\Vec{\beta}}$ but now what? We then consider a decision boundary in the form of 
+\begin{equation}
+    \Vec{w}\cdot \Vec{x} = t
+\end{equation}
+where $\Vec{w} = \hat{\Vec{\beta}}$ and $\Vec{x}$ is an input vector of an observation ($d\times1$). Since our $\Vec{w} = \hat{\Vec{\beta}}$ is zero-centered, so our dot product should be around zero. Hence we can set a classifier as 
+\begin{align*}
+    \hat{y} &= \text{sign}(\Vec{w}\cdot \Vec{x}) \\
+    &=
+    \begin{cases}
+    1 &\quad \text{sign}>0 \\
+    0 &\quad \text{sign}=0 \\
+    -1 &\quad \text{sign}<0
+    \end{cases} \qed
+\end{align*}
+
+\paragraph{Question}
+It seems like there might have certain observations that we can't predict if we have dot product = 0. And the estimated coefficients are not satisfying, Hoerl has came out something called Ridge Regression (need more understanding on Linear Algebra before proceed to it) and Tibshirani came out something called Lasso which believe to be an extension of Ridge.
+
+I shall leave the notes from yellow book later after basic SVM
+
+\subsection{Linear Basis Function Models}
+\paragraph{}
+The idea is to extend the solution obtained in section 1.2 into a more general form by using maximum likelihood approach. Says the linear regression is given by
+\begin{equation*}
+    y(\Vec{x},\Vec{\beta}) = \beta_0 + \beta_1 x_1 + \cdots + \beta_d x_d
+\end{equation*}
+where $\Vec{x}$ is the input vector and $\Vec{\beta}$ is the coefficient vector. Now, extend the class of models by considering linear combinations of fixed non-linear functions of the input variables,
+\begin{align}
+    y(\Vec{x},\Vec{\beta}) &= \displaystyle\sum_{i=0}^{d}[\beta_i\phi_i(x)] \nonumber \\
+    &= \Vec{\beta}^{T}\phi(\Vec{x})
+\end{align}
+where $\phi_i(x)$ is a function of variable $x_i$, $\phi_0(x)=1$ and $\phi(\Vec{x}) = (\phi_0,\phi_1,\cdots,\phi_d)^T$ is know as basic function.
+
+\paragraph{}
+Some examples of common basic function are:
+\begin{enumerate}
+    \item Gaussian Basic \\
+    \begin{equation*}
+        \phi_i(x) = \exp(-\frac{(x-\mu_i)}{2s^2})^2
+    \end{equation*}
+    $\mu_i$ and $s^2$ are mean and variance of variable $x_i$.
+    \item Logistic Sigmoid Function \\
+    \begin{equation*}
+        \phi_i(x) = \sigma(\frac{x-\mu_i}{s})
+    \end{equation*}
+    where $\sigma(a)=\frac{1}{1+\exp(-a)}$.
+    \item Polynomial Function
+    \begin{equation*}
+        \phi_i(x) = x^j
+    \end{equation*}
+    We can choose to take spline function to ease the computation.
+\end{enumerate}
+
+\subsubsection{Maximum Likelihood}
+Consider our target variable $(y)$ as $t$, given by a deterministric function $y(\Vec{x},\Vec{\beta})$ (our estimated linear regression) with additive Gaussian noise (error),
+\begin{equation*}
+    t = y(\Vec{x},\Vec{\beta}) + \varepsilon
+\end{equation*}
+where $\varepsilon$ is zero-mean with variance $s^2$.
+
+\paragraph{}
+Thus, the probability of $t$ given by $\Vec{x}, \Vec{\beta}, s^2$, 
+\begin{equation*}
+    p(t \mid \Vec{x}, \Vec{\beta}, s^2) = 
+    \mathcal{N}(t \mid y(\Vec{x},\Vec{\beta}), s^2)
+\end{equation*}
+Consider $n$ many observations,
+\begin{align}
+    p(\Vec{t} \mid \Vec{X}, \Vec{\beta}, s^2) &=
+    \prod_{i=1}^{n}\mathcal{N}(t \mid y(\Vec{x},\Vec{\beta}), s^2) \nonumber \\
+    &= \prod_{i=1}^{n}\mathcal{N}(t \mid \Vec{\beta}^{T}\phi(\Vec{x}_i), s^2) \hspace{5mm} \text{from eqn (15)}
+\end{align}
+where  $\Vec{x}_i$ is the input vector of $i$-th observation,
+$\Vec{t} = (t_1, \cdots,t_n)^{T}$ and $\Vec{X}$ is the data matrix.   
+\begin{align*}
+    \ln{p(\Vec{t} \mid \Vec{X}, \Vec{\beta}, s^2)} &=
+    \ln{\prod_{i=1}^{n}\mathcal{N}(t \mid \Vec{\beta}^{T}\phi(\Vec{x}_i), s^2)} \\
+    &= \displaystyle\sum_{i=1}^{n} \ln{\prod_{i=1}^{n}\mathcal{N}(t \mid \Vec{\beta}^{T}\phi(\Vec{x}_i), s^2)} \\
+    &= \displaystyle\sum_{i=1}^{n}
+    \ln{ \{ \frac{1}{(2\pi s^2)^\frac{1}{2}}\exp{[\frac{-1}{2s^2}(t_i - \Vec{\beta}^{T}\phi(\Vec{x}_i))}]\}} \\
+    &= \displaystyle\sum_{i=1}^{n}
+    [\ln(\frac{1}{2\pi s^2})^\frac{1}{2}+(\frac{-1}{2s^2})
+    (t_i - \Vec{\beta}^{T}\phi(\Vec{x}_i))] \\
+    &= \frac{n}{2}\ln(\frac{1}{2\pi s^2}) - \frac{1}{2s^2}
+    \displaystyle\sum_{i=1}^{n}[t_i - \Vec{\beta}^{T}\phi(\Vec{x}_i)] 
+\end{align*}
+Then, differentiate the log w.r.t $\Vec{\beta}$ and solve it equal to zero, we've 
+\begin{align}
+    \frac{\partial}{\partial\Vec{\beta}}\ln{p(\Vec{t} \mid \Vec{X}, \Vec{\beta}, s^2)} &= \frac{1}{2s^2}\displaystyle\sum_{i=1}^{n}[t_i - \Vec{\beta}^{T}\phi(\Vec{x}_i)]\phi^{T}(\Vec{x}_i) \nonumber \\
+    \displaystyle\sum_{i=1}^{n}[t_i - \Vec{\beta}^{T}\phi(\Vec{x}_i)]\phi^{T}(\Vec{x}_i) &= 0 \nonumber \\
+    \Vec{\beta}^{T}\displaystyle\sum_{i=1}^{n}[\phi(\Vec{x}_i)\phi^{T}(\Vec{x}_i)] &= \displaystyle\sum_{i=1}^{n}[t_i\phi^{T}(\Vec{x}_i)] \nonumber \\
+    \Vec{\beta}^{T}[\phi(\Vec{x})\phi^{T}(\Vec{x})] &= \Vec{t}\phi^{T}(\Vec{x}) \nonumber \\
+    [\phi^{T}(\Vec{x})\phi(\Vec{x})] \Vec{\beta} &= \phi(\Vec{x})\Vec{t}^{T} \nonumber \\
+    \hat{\Vec{\beta}} &= [\phi^{T}(\Vec{x})\phi(\Vec{x})]^{-1}[\phi(\Vec{x})\Vec{t}^{T}]
+    \qed
+\end{align}
+where
+\begin{equation*}
+    \phi(\Vec{x}) = 
+    \begin{pmatrix}
+    \phi_0(\Vec{x}_1) & \phi_1(\Vec{x}_1) & \cdots & \phi_d(\Vec{x}_1) \\
+    \phi_0(\Vec{x}_2) & \phi_1(\Vec{x}_2) & \cdots & \phi_d(\Vec{x}_2) \\
+    \vdots \\
+    \phi_0(\Vec{x}_n) & \phi_1(\Vec{x}_n) & \cdots & \phi_d(\Vec{x}_n) \\
+    \end{pmatrix}
+\end{equation*}
+
+\paragraph{}
+Compare equation (12) and (17), we should have realize previously we were deriving the solution by taking basic function in the form of 
+\begin{equation*}
+    \phi_i(x) = \frac{x-\mu_i}{s_i}.
+\end{equation*}
+\paragraph{Question} Is the target variable $t$ transformed from $y$ by the basic functions?
+\end{document}
+

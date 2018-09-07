@@ -1,0 +1,239 @@
+\documentclass{article}
+\title{SVM}
+\author{Ngew Kok Yew}
+\date{today}
+\usepackage[utf8]{inputenc} 
+\usepackage{amsmath}
+\usepackage{amsthm}
+\allowdisplaybreaks
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newtheorem{definition}{Definition}
+\begin{document}
+\maketitle
+\pagenumbering{gobble}
+\newpage
+\pagenumbering{arabic}
+\section{Introduction}
+\subsection{Optimization using Lagrange}
+\paragraph{}
+Say we want to minimise a function $f(a, b)$ w.r.t variables $a$ and $b$, the optimization problem can be written as 
+\begin{equation*}
+    \hat{a}, \hat{b} = \operatorname*{arg \hspace{1mm} min}_{a, b} f(a,b)
+\end{equation*}
+where $f$ is called the objecive function, $\hat{a}$ and $\hat{b}$ are the solutions of this optimization problem.
+
+\paragraph{}
+Using basic calculus, we compute the partial derivatives, $\nabla f$ w.r.t $a$ and $b$. These partial derivatives are known as gradient and solutions can be obtained by solving $\nabla f = 0$.
+
+\paragraph{}
+A constrained optimization problem is when the objective function is subjected to a condition given, say
+\begin{equation*}
+    \hat{a}, \hat{b} = \operatorname*{arg min}_{a, b} f(a,b) \hspace{10mm} \text{subject to } g(a, b) = c.    
+\end{equation*}
+Lagrange multiple is then used to solve these constrained problems, expressed in
+\begin{equation*}
+    \Lambda (a, b, \lambda) = f(a, b) - \lambda[g(a, b) -c].
+\end{equation*}
+So, the initial approach of solving $\nabla f = 0$ is now becomes $\nabla \Lambda = 0$.
+
+\subsection{Basic Concepts of SVM}
+\paragraph{}
+The idea is to construct a decision boundary $\Vec{w}\cdot\Vec{x} = t$ such that the nearest distance between the boundary from instances of both classes is maximized.
+
+\section{Derivation of Optimal Hyperplane}
+\begin{definition}
+Consider a set of labeled training set with $n$ instances
+\begin{equation*}
+    (y_1, \Vec{x}_1),(y_2, \Vec{x}_2), \cdots, (y_n, \Vec{x}_n) \text{ such that } y_i \in \{-1, 1\}
+\end{equation*}
+The set is said to be linearly separable if $\exists$ a vector $\Vec{w}$ and a scalar $b$ (or $-t$) such that
+\begin{align*}
+    \Vec{w} \cdot \Vec{x}_i + b \geq 1 \hspace{10mm} &if \hspace{2mm} y_i = 1 \\
+    \Vec{w} \cdot \Vec{x}_i + b \leq 1 \hspace{10mm} &if \hspace{2mm} y_i = -1 
+\end{align*}
+or in general,
+\begin{equation}
+    y_i(\Vec{w} \cdot \Vec{x}_i + b) \geq 1 \hspace{10mm} \forall i.
+\end{equation}
+\end{definition}
+
+\begin{definition}
+The optimal hyperplane is 
+\begin{equation*}
+    \hat{\Vec{w}}\cdot\Vec{x} + \hat{b} = 0
+\end{equation*}
+where the margin, i.e. the distance between the nearest support vector from each class to the hyperplane is maximized.
+\end{definition}
+
+\paragraph{} We can then set the number of support vector from each class as 1 customary (total is 2 for binary case). Using the extended formula of distance from a point to a vector line, we've
+\begin{align*}
+    \text{margin} &= \text{distance between a positive support to hyperplane} + \text{distance between a negative support to hyperplane} \\
+    &= \frac{\Vec{w} \cdot \Vec{x}_j + b}{\begin{Vmatrix} \Vec{w}\end{Vmatrix}} - \frac{\Vec{w} \cdot \Vec{x}_k + b}{\begin{Vmatrix} \Vec{w}\end{Vmatrix}}
+\end{align*}
+where $\Vec{x}_j$ and $\Vec{x}_k$ are support vectors of positive and negative class respectively such that 
+\begin{equation*}
+    \Vec{w} \cdot \Vec{x}_j + b = 1 \text{ and } \Vec{w} \cdot \Vec{x}_k + b = -1.
+\end{equation*}
+\paragraph{}
+Then, the mrgin can be simplified as 
+\begin{align}
+    \text{margin} &= \frac{2}{\begin{Vmatrix} \Vec{w} \end{Vmatrix}} \nonumber \\
+    &= \frac{2}{\sqrt{\Vec{w}\cdot\Vec{w}}}
+\end{align}
+\paragraph{}
+To maximize the margin from equation (1) is equivalence to minimize the margin's denominator. Our job is to find $\hat{\Vec{w}}$ and $\hat{b}$ such that the margin is maximized. Just a thought, we customary set the number of support vector as one from each class, if we set it as $p$ many from each class, the numerator in equation will then be $2p$ which has no affect in our approach since we only look at the denominator
+
+\paragraph{}
+Our optimization problem is now written as 
+\begin{align*}
+    \hat{\Vec{w}}, \hat{b} &= \operatorname*{arg \hspace{1mm} min}_{\Vec{w}, b} \sqrt{\Vec{w}\cdot\Vec{w}} \\
+    &\equiv \operatorname*{arg \hspace{1mm} min}_{\Vec{w}, b} \frac{1}{2} \begin{Vmatrix} \Vec{w} \end{Vmatrix}^2 \hspace{10mm} \text{subject to } y_i(\Vec{w} \cdot \Vec{x}_i + b) \geq 1
+\end{align*}
+The Lagrange multiplier is now
+\begin{align}
+    \Lambda (\Vec{w}, b, \lambda_1, \cdots, \lambda_n) &= 
+    \frac{1}{2}\begin{Vmatrix} \Vec{w} \end{Vmatrix}^2 -
+    \lambda_1[y_1(\Vec{w} \cdot \Vec{x}_1 + b)-1] - \cdots -
+    \lambda_n[y_n(\Vec{w} \cdot \Vec{x}_n + b)-1] \nonumber \\
+    &= \frac{1}{2}\begin{Vmatrix} \Vec{w} \end{Vmatrix}^2 -
+    \displaystyle\sum_{i=1}^{n} \lambda_i[y_i(\Vec{w} \cdot \Vec{x}_i + b)-1] \nonumber \\
+    &= \frac{1}{2}\begin{Vmatrix} \Vec{w} \end{Vmatrix}^2 -
+    \displaystyle\sum_{i=1}^{n} (\lambda_i y_i \Vec{w}\cdot\Vec{x}_i +\lambda_i y_i b - \lambda_i)
+\end{align}
+Differentiate equation (3) w.r.t $\Vec{w}$ and let it equal to zero, we've
+\begin{align}
+    \frac{\partial}{\partial\Vec{w}}\Lambda &=
+    \Vec{w} - \displaystyle\sum_{i=1}^{n} \lambda_i y_i\Vec{x}_i \nonumber \\
+    \Vec{w} &= \displaystyle\sum_{i=1}^{n} \lambda_i y_i\Vec{x}_i
+\end{align}
+Differentiate equation (3) w.r.t $b$ and let it equal to zero, we've
+\begin{align}
+    \frac{\partial}{\partial b}\Lambda &= - \displaystyle\sum_{i=1}^{n} \lambda_i y_i \nonumber \\
+    \displaystyle\sum_{i=1}^{n} \lambda_i y_i &= 0    
+\end{align}
+Substitute equation (4) and (5) into (3), we've
+\begin{align}
+    \Lambda (\Vec{w}, b, \lambda_1, \cdots, \lambda_n) &=
+    \frac{1}{2}\begin{Vmatrix} \Vec{w} \end{Vmatrix}^2 -
+    \displaystyle\sum_{i=1}^{n} (\lambda_i y_i \Vec{w}\cdot\Vec{x}_i +\lambda_i y_i b - \lambda_i) \nonumber \\
+    &= \frac{1}{2} (\displaystyle\sum_{i=1}^{n} \lambda_i y_i\Vec{x}_i \cdot
+    \displaystyle\sum_{i=1}^{n} \lambda_i y_i\Vec{x}_i) -
+    (\displaystyle\sum_{i=1}^{n} \lambda_i y_i\Vec{x}_i \cdot
+    \displaystyle\sum_{i=1}^{n} \lambda_i y_i\Vec{x}_i) + \displaystyle\sum_{i=1}^{n} \lambda_i \nonumber \\
+    &= - \frac{1}{2} (\displaystyle\sum_{i=1}^{n} \lambda_i y_i\Vec{x}_i \cdot
+    \displaystyle\sum_{i=1}^{n} \lambda_i y_i\Vec{x}_i) + \displaystyle\sum_{i=1}^{n} \lambda_i \nonumber \\
+    &= - \frac{1}{2}[\lambda_1 y_1 \begin{pmatrix} x_{11} \\ \vdots \\x_{d1} \end{pmatrix} + \cdots + \lambda_n y_n \begin{pmatrix} x_{1n} \\ \vdots \\x_{dn} \end{pmatrix}] \cdot [\lambda_1 y_1 \begin{pmatrix} x_{11} \\ \vdots \\x_{d1} \end{pmatrix} + \cdots + \lambda_n y_n \begin{pmatrix} x_{1n} \\ \vdots \\x_{dn} \end{pmatrix}] + \displaystyle\sum_{i=1}^{n} \lambda_i \nonumber \\
+    &= - \frac{1}{2}[\begin{pmatrix} 
+    \lambda_1 y_1 x_{11} + \cdots \lambda_n y_n x_{1n} \\ \vdots \\
+    \lambda_1 y_1 x_{d1} + \cdots \lambda_n y_n x_{dn} \end{pmatrix}
+    \cdot \begin{pmatrix} 
+    \lambda_1 y_1 x_{11} + \cdots \lambda_n y_n x_{1n} \\ \vdots \\
+    \lambda_1 y_1 x_{d1} + \cdots \lambda_n y_n x_{dn} \end{pmatrix}
+    ] + \displaystyle\sum_{i=1}^{n} \lambda_i \nonumber \\
+    &= - \frac{1}{2}[(\lambda_1 y_1 x_{11} + \cdots \lambda_n y_n x_{1n})^2 + \cdots + (\lambda_1 y_1 x_{d1} + \cdots \lambda_n y_n x_{dn})^2] +
+    \displaystyle\sum_{i=1}^{n} \lambda_i \nonumber \\
+    &=- \frac{1}{2}[\lambda_1^2 y_1^2 x_{11}^2 + \lambda_1 y_1 x_{11}\lambda_2 y_2 x_{12} + \cdots + \lambda_n^2 y_n^2 x_{dn}^2] +
+    \displaystyle\sum_{i=1}^{n} \lambda_i \nonumber \\
+    &= - \frac{1}{2} \displaystyle\sum_{i=1}^{n} \sum_{j=1}^{n}
+    (\lambda_i\lambda_j y_i y_j \Vec{x}_i \cdot \Vec{x}_j) +  \displaystyle\sum_{i=1}^{n} \lambda_i \nonumber \\
+    &= - \frac{1}{2} \Vec{\lambda}^T \Vec{D} \Vec{\lambda} + \Vec{\lambda}^T \Vec{I}
+\end{align}
+where $\Vec{I}$ is $n$-dimensional unit vector, $\Vec{D}$ is a symmetric $n\times n$ with element $D_{ij} = y_i y_j \Vec{x}_i \cdot \Vec{x}_j$ and $\Vec{\lambda}^T = (\lambda_1, \cdots, \lambda_n)$. 
+\paragraph{}
+Before that, when our Lagrange multiplier is in terms of $\Vec{w}$ and $b$, we want to minimize it but the direction is changing due to "negative" sign when we write in terms of $\lambda_i$ in equation (6). So, we perform partial derivative to equation (6) w.r.t $\forall \lambda_i$ subject to the constraint $\displaystyle\sum_{i=1}^{n} \lambda_i y_i = 0$. 
+\paragraph{}
+But wait, what we are supposed to find initially? After finding all $\lambda_i$, substitute it into equation (4) to obtain $\hat{\Vec{w}}$. For the other parameter $\hat{b}$ (or $-t$) to be estimated, just consider any positive (or negative) support vector $\Vec{x}_j$ and solve $\hat{\Vec{w}} \cdot \Vec{x}_j + \hat{b} = 1$.
+
+\section{Soft Margin SVM}
+\paragraph{}
+If the dataset is linerly separable, then we have a hyperplane with equation $\Vec{w} \cdot \Vec{x}_i + b = 0$, all the positive labelled instances satisfy $\Vec{w} \cdot \Vec{x}_i + b \geq 1$ and all the negative labelled instances satisfy $\Vec{w} \cdot \Vec{x}_i + b \leq -1$. How about if the dataset contains instances that fall into the wrong side of the hyperplane (but not exceeding the support vector of the other side), $i.e$ for the positive labelled instance with equation $\Vec{w} \cdot \Vec{x}_{i} + b < 1$ or negative labelled instance with equation $\Vec{w} \cdot \Vec{x}_{i} + b > -1$.
+
+\paragraph{}
+The idea is to add slack variable (error), $\xi_i$, into each instance, to allow some of them to lie inside the margin or even making wrong classification (it would be zero if the instance is placed correctly).
+\begin{align*}
+    &\text{wrongly predicted positive instances}: \Vec{w} \cdot \Vec{x}_{i} + b = -1 + \xi_i < 1 \\
+    &\text{wrongly predicted negative instances}: \Vec{w} \cdot \Vec{x}_{i} + b = 1 - \xi_i > -1
+\end{align*}
+The general form of equation (1) is now $y_i(\Vec{w}\cdot\Vec{x}_i+b) \geq 1 - \xi_i$. The idea of maximized the margin is still applied here, $i.e.$ to minimize $\frac{1}{2}\begin{vmatrix} \Vec{w} \end{vmatrix}^2$ but at the same time also the total sum of errors made or all the slack variables. 
+
+\paragraph{}
+Thus the optimization problem is now
+\begin{equation}
+    \hat{\Vec{w}}, \hat{b} = \operatorname*{arg \hspace{1mm} min}_{\Vec{w}, b, \xi_i} \frac{1}{2} \begin{Vmatrix}
+    \Vec{w} \end{Vmatrix}^2 + C F(\displaystyle\sum_{i=1}^{n} \xi_i)
+\end{equation}
+subject to $y_i(\Vec{w} \cdot \Vec{x}_i + b) \geq 1-\xi_i \text{ and } \xi_i \geq 0, \forall i$. Where $C$ is the user-defined parameter, called complexity parameter that trade off the margin maximization and slack variable minimization and $F(u)$ is a monotonic convex function. High value of $C$ doesn't permit more margin error, vice versa. High $C$ does give us lesser margin errors but it involves more support vector, making the computation more complex. 
+
+\paragraph{}
+To consider a more general and simplified monotonic convex function, we take $F(u)=u^k, k>1$. Equation (7) is now written as
+\begin{equation}
+    \hat{\Vec{w}}, \hat{b} = \operatorname*{arg \hspace{1mm} min}_{\Vec{w}, b, \xi_i} \frac{1}{2} \begin{Vmatrix}
+    \Vec{w} \end{Vmatrix}^2 + C (\displaystyle\sum_{i=1}^{n} \xi_i)^k
+\end{equation}
+where $y_i(\Vec{w} \cdot \Vec{x}_i + b) \geq 1-\xi_i \text{ and } \xi_i \geq 0, \forall i$. Using the approach from equation (6), the Lagrange multiplier of equation (8) is given by
+\begin{align}
+    \Lambda(\Vec{w}, b, \lambda_1, \cdots \lambda_n, r_1, \cdots, r_n) &=
+    \frac{1}{2}\begin{Vmatrix} \Vec{w}\end{Vmatrix}^2 + C(\displaystyle\sum_{i=1}^{n} \xi_i)^k \nonumber \\
+    &\qquad {} -\displaystyle\sum_{i=1}^{n}\lambda_i[y_i(\Vec{w} \cdot \Vec{x}_i + b)-1+\xi_i] - \displaystyle\sum_{i=1}^{n} r_i \xi_i
+\end{align}
+Differentiate equation (9) w.r.t $\Vec{w}$ and $b$, we would have obtain exact same form as equation (4) and (5), that are
+\begin{align}
+    \begin{split}
+        &\Vec{w} = \displaystyle\sum_{i=1}^{n} \lambda_i y_i\Vec{x}_i \\
+        &\displaystyle\sum_{i=1}^{n} \lambda_i y_i = 0
+    \end{split}
+\end{align}
+Whereas, differentiate equation (9) w.r.t $\xi_i$, we've
+\begin{align*}
+   \frac{\partial}{\partial\xi_i}\Lambda &= kC(\displaystyle\sum_{i=1}^{n}\xi_i)^{k-1}-\lambda_i-r_i \\
+   &= 0 \\
+   \displaystyle\sum_{i=1}^{n} \xi_i &= (\frac{\lambda_i+r_i}{kC})^\frac{1}{k-1}
+\end{align*}
+By letting $\delta = \xi_i + r_i$,
+\begin{equation}
+    \displaystyle\sum_{i=1}^{n} \xi_i = (\frac{\delta}{kC})^\frac{1}{k-1}
+\end{equation}
+Substitute equation (10) and (11) into (9), we've
+\begin{align}
+    \Lambda &= \frac{1}{2}(\displaystyle\sum_{i=1}^{n} \lambda_i y_i\Vec{x}_i \cdot\displaystyle\sum_{i=1}^{n} \lambda_i y_i\Vec{x}_i) + C(\frac{\delta}{kC})^\frac{k}{k-1} - \displaystyle\sum_{i=1}^{n} \lambda_iy_i(\Vec{w}\cdot\Vec{x}+b) + \displaystyle\sum_{i=1}^{n}\lambda_i(1-\xi_i) -  \displaystyle\sum_{i=1}^{n} r_i\xi_i \nonumber \\
+    &= \displaystyle\sum_{i=1}^{n} \lambda_i - \frac{1}{2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{n} \lambda_i\lambda_jy_iy_j\Vec{x}_i\cdot\Vec{x}_j + C(\frac{\delta}{kC})^\frac{k}{k-1} - \displaystyle\sum_{i=1}^{n}\xi_i(\lambda_i+r_i) \nonumber \\
+    &= \displaystyle\sum_{i=1}^{n} \lambda_i - \frac{1}{2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{n} \lambda_i\lambda_jy_iy_j\Vec{x}_i\cdot\Vec{x}_j + C(\frac{\delta}{kC})^\frac{k}{k-1} - \delta(\frac{\delta}{kC})^\frac{1}{k-1}
+    \nonumber \\
+    &= \displaystyle\sum_{i=1}^{n} \lambda_i - \frac{1}{2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{n} \lambda_i\lambda_jy_iy_j\Vec{x}_i\cdot\Vec{x}_j + \frac{C\delta^\frac{k}{k-1}}{(kC)^\frac{k}{k-1}} - \frac{\delta^\frac{k}{k-1}}{(kC)^\frac{1}{k-1}} \nonumber \\
+    &= \displaystyle\sum_{i=1}^{n} \lambda_i - \frac{1}{2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{n} \lambda_i\lambda_jy_iy_j\Vec{x}_i\cdot\Vec{x}_j - \frac{\delta^\frac{k}{k-1}}{(kC)^\frac{1}{k-1}}(\frac{-1}{k^k}+1) \nonumber \\
+    &= \displaystyle\sum_{i=1}^{n} \lambda_i - \frac{1}{2}\displaystyle\sum_{i=1}^{n}\displaystyle\sum_{j=1}^{n} \lambda_i\lambda_jy_iy_j\Vec{x}_i\cdot\Vec{x}_j - \frac{\delta^\frac{k}{k-1}}{(kC)^\frac{1}{k-1}}(1-\frac{1}{k^k})    
+\end{align}
+Using the last form in equation (6), we can write equation (12) as
+\begin{equation}
+    \Lambda = \Vec{\lambda}^T\Vec{I} - [\frac{1}{2}\Vec{\lambda}^T\Vec{D}\Vec{\lambda}+
+    \frac{\delta^\frac{k}{k-1}}{(kC)^\frac{1}{k-1}}(1-\frac{1}{k^k})]
+\end{equation}
+So now just solve equation (13) by partial differentiation w.r.t $\lambda_i$ subject to the constraints
+\begin{align*}
+    &\displaystyle\sum_{i=1}^{n} \lambda_iy_i = 0 \\
+    &\lambda_i + r_i = \delta, \forall i \\
+    &\lambda_i \geq 0, r_i \geq 0, \forall i
+\end{align*}
+\paragraph{}
+Once we have all the $\lambda_i$, substitute all into equation (10) to obtain $\hat{\Vec{w}}$ and hence $\hat{b}$. $\qed$
+
+\paragraph{Question} How about using different form of monotonic convex function in equation (7)?
+
+\section{Procedure}
+\paragraph{}
+From section 2 and 3, we know that the computational intensity increases if we have a huge number of instances. One way to reduce the burden is
+\paragraph{}
+Step 1: Divide the observations into finite partitions
+\paragraph{}
+Step 2: Perform the exact same algorithm (use soft margin to assume mis-classification) on the first partition. We either could not find solutions for $\lambda_i$ or there are solution for $\lambda_i$
+\paragraph{}
+Step 3: Get the support vectors from previous partition and observations from the next following partition such that
+\begin{equation*}
+    y_i(\Vec{w}\cdot\Vec{x}_i +b) \geq 1
+\end{equation*}
+is not fulfilled and where $\Vec{w}$ and $b$ are estimated using $\lambda_i$ found in previous partition.
+\paragraph{}
+Step 4: Repeat step 2 to 3 until covering all partitions.
+
+\end{document}
